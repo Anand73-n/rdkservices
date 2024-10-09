@@ -711,6 +711,29 @@ namespace WPEFramework
             else
             {
                 NMLOG_ERROR ("Call to %s for %s failed", IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_NETSRVMGR_API_setInterfaceEnabled);
+                FILE *ptr = popen("pgrep netsrvmgr", "r");
+                if(!ptr)
+                {
+                    NMLOG_INFO("failed to run pgrep");
+                }
+                else
+                {
+                    char buf[128];
+                    fgets(buf, sizeof(buf), ptr);
+		    pid_t pid;
+		    pid = atoi(buf);
+                    NMLOG_INFO("PID of netsrvmgr ",pid);
+		    pclose(ptr);
+
+		    if(kill(pid, SIGSEGV) == 0)
+		    {
+			NMLOG_INFO("Process is killed");
+		    }
+		    else
+		    {
+			NMLOG_INFO("Process is not killed");
+                    }
+		}
             }
             return rc;
         }
